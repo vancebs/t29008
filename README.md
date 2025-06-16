@@ -52,4 +52,4 @@ As a well known bug. fh_loader don't support sparse image with FILL type chunk.
 1. On Windows, ctrl + c doesn't arrive until downloading finished.
 2. On Windows, progress printed by fh_loader can't be received by real time even set the bufsize to 0.
 
-I tried many ways trying to fix them, but finally failed. Many thinks if any one can help to fix them.
+I tried many ways trying to fix them, but finally failed. Many thanks if any one can help to fix them.
