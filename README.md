@@ -3,9 +3,14 @@
 ## Description
 A multi-download tool to download Qualcomm device with 9008(EDL) based on **QShareServer** and **fh_loader**
 
-## Supported OS
-* Windows
-* Linux (Tested on Ubuntu 24.04)
+## Requirements
+* Supported OS
+  * Windows
+  * Linux (Tested on Ubuntu 24.04)
+* Python
+  * version >= 3.12
+
+
 
 ## Usage
 ```
