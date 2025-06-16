@@ -8,7 +8,7 @@ A multi-download tool to download Qualcomm device with 9008(EDL) based on **QSha
 * Linux (Tested on Ubuntu 24.04)
 
 ## Usage
-```bash
+```
 parameters
     -vip|-v                          enable vip download
     -reboot-on-success|-r            reboot device when download success
@@ -22,6 +22,7 @@ parameters
 i.e.
     python t29008.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image
     python t29008.py -v -r -t my_port_trace -i vip_image
+    python t29008.py -v -r -t my_port_trace -i vip_image -p prog_firehose_ddr.elf -sd DigestsSigned.bin.mbn -cd ChainedTableOfDigests.bin
 ```
 
 ## Build Binary

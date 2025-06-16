@@ -20,7 +20,8 @@ def show_help():
         '',
         'i.e.',
         '    python t29008.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image',
-        '    python t29008.py -v -r -t my_port_trace -i vip_image'
+        '    python t29008.py -v -r -t my_port_trace -i vip_image',
+        '    python t29008.py -v -r -t my_port_trace -i vip_image -p prog_firehose_ddr.elf -sd DigestsSigned.bin.mbn -cd ChainedTableOfDigests.bin'
     )))
 
 
