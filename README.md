@@ -24,6 +24,9 @@ parameters
     -signeddigests|-sd <filename>    file name of signed digests (auto search if not set)
     -chaineddigests|-cd <filename>   file name of chained digests (auto search if not set)
 
+exit
+    ctrl + c
+
 i.e.
     python t29008.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image
     python t29008.py -v -r -t my_port_trace -i vip_image
@@ -44,3 +47,9 @@ i.e.
 
 ## Limitation
 As a well known bug. fh_loader don't support sparse image with FILL type chunk.
+
+## Known Issues
+1. On Windows, ctrl + c doesn't arrive until downloading finished.
+2. On Windows, progress printed by fh_loader can't be received by real time even set the bufsize to 0.
+
+I tried many ways trying to fix them, but finally failed. Many thinks if any one can help to fix them.
