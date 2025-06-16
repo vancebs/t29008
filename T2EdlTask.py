@@ -44,7 +44,10 @@ class T2EdlTask(Task):
                  image_dir: str,
                  trace_dir: str,
                  is_vip: bool = False,
-                 reboot_on_success: bool = False):
+                 reboot_on_success: bool = False,
+                 prog: str = 'prog_firehose_ddr.elf',
+                 signed_digests: str | None = None,
+                 chained_digests: str | None = None):
         super().__init__()
 
         self._port = port
@@ -52,6 +55,9 @@ class T2EdlTask(Task):
         self._trace_dir = trace_dir
         self._is_vip = is_vip
         self._reboot_on_success = reboot_on_success
+        self._prog = prog
+        self._signed_digests = signed_digests
+        self._chained_digests = chained_digests
 
         self._slash = '\\' if platform.system() == 'Windows' else '/'
         if not self._image_dir.endswith(self._slash):
@@ -85,7 +91,7 @@ class T2EdlTask(Task):
         cmd = [
             T2EdlTask.bin_sahara(),
             '-p', T2EdlTask.param_port(self._port),
-            '-s', '13:prog_firehose_ddr.elf',
+            '-s', f'13:{self._prog}',
             '-b', self._image_dir
         ]
 
@@ -121,18 +127,20 @@ class T2EdlTask(Task):
         ]
         if self._is_vip:
             # find signeddigests
-            signeddigests = T2EdlTask.param_signeddigests(self._image_dir)
-            if signeddigests is None:
-                return False, 'signeddigests file not exists'
+            if self._signed_digests is None:
+                self._signed_digests = T2EdlTask.param_signeddigests(self._image_dir)
+                if self._signed_digests is None:
+                    return False, 'signeddigests file not exists'
 
             # find chaineddigests
-            chaineddigests = T2EdlTask.param_chaineddigests(self._image_dir)
-            if chaineddigests is None:
-                return False, 'chaineddigests file not exists'
+            if self._chained_digests is None:
+                self._chained_digests = T2EdlTask.param_chaineddigests(self._image_dir)
+                if self._chained_digests is None:
+                    return False, 'chaineddigests file not exists'
 
             cmd.extend([
-                f'--signeddigests={signeddigests}',
-                f'--chaineddigests={chaineddigests}'])
+                f'--signeddigests={self._signed_digests}',
+                f'--chaineddigests={self._chained_digests}'])
         if self._reboot_on_success:
             cmd.append('--power=reset,1')
 

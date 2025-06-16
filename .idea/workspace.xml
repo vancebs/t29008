@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="835e3c45-ce94-4ece-8632-899f03a6521d" name="更改" comment="first commit" />
+    <list default="true" id="835e3c45-ce94-4ece-8632-899f03a6521d" name="更改" comment="first commit">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/T2Edl.py" beforeDir="false" afterPath="$PROJECT_DIR$/T2Edl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/T2EdlTask.py" beforeDir="false" afterPath="$PROJECT_DIR$/T2EdlTask.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/t29008.py" beforeDir="false" afterPath="$PROJECT_DIR$/t29008.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -87,7 +93,7 @@
       <updated>1749976517069</updated>
       <workItem from="1749976528975" duration="12788000" />
       <workItem from="1749996566143" duration="28790000" />
-      <workItem from="1750068105307" duration="5338000" />
+      <workItem from="1750068105307" duration="7620000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />

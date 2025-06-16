@@ -9,15 +9,18 @@ from T2EdlUi import T2EdlUi
 def show_help():
     print('\n'.join((
         'parameters',
-        '    -vip, -v                  enable vip download',
-        '    -reboot-on-success, -r    reboot device when download success',
-        '    -trace-dir, -t            dir to save port_trace (default dir is "port_trace")',
-        '    -image-dir, -i            image dir',
-        '    -max-download-count, -n   auto stop after n device is downloaded',
+        '    -vip|-v                          enable vip download',
+        '    -reboot-on-success|-r            reboot device when download success',
+        '    -trace-dir|-t <dir>              dir to save port_trace (default dir is "port_trace")',
+        '    -image-dir|-i <dir>              image dir',
+        '    -max-download-count|-n <count>   auto stop after n device is downloaded',
+        '    -prog|-p <filename>              prog file name (default is "prog_firehose_ddr.elf")',
+        '    -signeddigests|-sd <filename>    file name of signed digests (auto search if not set)',
+        '    -chaineddigests|-cd <filename>   file name of chained digests (auto search if not set)',
         '',
         'i.e.',
-        '    python m_fh_loader.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image',
-        '    python m_fh_loader.py -v -r -t my_port_trace -i vip_image'
+        '    python t29008.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image',
+        '    python t29008.py -v -r -t my_port_trace -i vip_image'
     )))
 
 
@@ -33,6 +36,9 @@ def main() -> int:
     trace_dir = 'port_trace'
     image_dir: str|None = None
     max_download_count: int = 0
+    prog: str = 'prog_firehose_ddr.elf'
+    signed_digests: str|None = None
+    chained_digests: str|None = None
 
     # load parameter
     args = [arg for arg in sys.argv[1:]]
@@ -65,6 +71,24 @@ def main() -> int:
                     return -1
                 max_download_count = int(args[1])
                 args = args[2:]
+            case '-prog' | '-p':
+                if len(args) < 2:
+                    show_error('prog file name not provided!!')
+                    return -1
+                prog = args[1]
+                args = args[2:]
+            case '-signeddigests' | '-sd':
+                if len(args) < 2:
+                    show_error('signeddigests file name not provided!!')
+                    return -1
+                signed_digests = args[1]
+                args = args[2:]
+            case '-chaineddigests' | '-cd':
+                if len(args) < 2:
+                    show_error('chaineddigests file name not provided!!')
+                    return -1
+                chained_digests = args[1]
+                args = args[2:]
             case _:
                 show_error(f'unknown parameter: "{args[0]}"')
                 return -1
@@ -84,7 +108,10 @@ def main() -> int:
                      is_vip=is_vip,
                      reboot_on_success=reboot_on_success,
                      trace_dir=trace_dir,
-                     max_download_count=max_download_count)
+                     max_download_count=max_download_count,
+                     prog=prog,
+                     signed_digests=signed_digests,
+                     chained_digests=chained_digests)
     instance.watch(T2EdlUi())
 
     # install ctrl_c handler

@@ -39,12 +39,18 @@ class T2Edl(object):
                  is_vip: bool = False,
                  reboot_on_success: bool = False,
                  trace_dir: str = os.path.join(Application.get().application_dir(), 'port_trace'),
-                 max_download_count: int = 0):
+                 max_download_count: int = 0,
+                 prog: str = 'prog_firehose_ddr.elf',
+                 signed_digests: str|None = None,
+                 chained_digests: str|None = None):
         self._image_dir = image_dir
         self._is_vip = is_vip
         self._reboot_on_success = reboot_on_success
         self._trace_dir = trace_dir
         self._max_download_count = max_download_count
+        self._prog = prog
+        self._signed_digests = signed_digests
+        self._chained_digests = chained_digests
 
         self._started_task_count = 0
 
@@ -103,7 +109,14 @@ class T2Edl(object):
             return # already started
 
         self.notify_start_progress(port)
-        task = T2EdlTask(port, self._image_dir, self._trace_dir, is_vip=self._is_vip, reboot_on_success=self._reboot_on_success)
+        task = T2EdlTask(port,
+                         self._image_dir,
+                         self._trace_dir,
+                         is_vip=self._is_vip,
+                         reboot_on_success=self._reboot_on_success,
+                         prog=self._prog,
+                         signed_digests=self._signed_digests,
+                         chained_digests=self._chained_digests)
         self._running_tasks[port] = task
         task.set_state_update_listener(
             lambda state, cur_progress, max_progress, message: self.on_task_state_updated(port, task, state,
