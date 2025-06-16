@@ -8,7 +8,7 @@ A multi-download tool to download Qualcomm device with 9008(EDL) based on **QSha
 * Linux (Tested on Ubuntu 24.04)
 
 ## Usage
-```
+```bash
 parameters
     -vip|-v                          enable vip download
     -reboot-on-success|-r            reboot device when download success
@@ -23,6 +23,18 @@ i.e.
     python t29008.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image
     python t29008.py -v -r -t my_port_trace -i vip_image
 ```
+
+## Build Binary
+### Windows
+  ```bash
+  .\build.bat
+  ```
+  binary path: **dist_windows\t29008.exe**
+### Linux
+  ```bash
+  ./build.sh
+  ```
+  binary path: **dist_linux/t29008**
 
 ## Limitation
 As a well known bug. fh_loader don't support sparse image with FILL type chunk.
