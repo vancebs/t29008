@@ -22,11 +22,6 @@ class Application(object):
         self._misc_dir = os.path.join(self._script_dir, 'misc')
         self._tool_dir = os.path.join(self._misc_dir, 'vip_download_tool')
 
-        print({
-            'app_dir': self._application_dir,
-            'script_dir': self._script_dir
-        })
-
     def application_dir(self) -> str:
         return self._application_dir
 

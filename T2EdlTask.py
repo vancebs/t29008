@@ -123,7 +123,8 @@ class T2EdlTask(Task):
             '--memoryname=ufs',
             '--setactivepartition=1',
             f'--zlpawarehost={T2EdlTask.param_zlpawarehost()}',
-            f'--porttracename={trace_file}'
+            f'--porttracename={trace_file}',
+            '--noprompt'
         ]
         if self._is_vip:
             cmd.extend([
@@ -142,9 +143,9 @@ class T2EdlTask(Task):
             encoding=T2EdlTask.encoding()
         )
 
-        # write \n to pass 'Press any key to exit' when error
-        fh_loader.stdin.write('\n')
-        fh_loader.stdin.flush()
+        # # write \n to pass 'Press any key to exit' when error
+        # fh_loader.stdin.write('\n')
+        # fh_loader.stdin.flush()
 
         # progress
         for line in fh_loader.stdout:

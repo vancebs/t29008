@@ -87,8 +87,11 @@ class T2Edl(object):
             self._signed_digests = None
             self._chained_digests = None
 
+        # show vip status
         if self._is_vip:
-            self.notify_info_message('VIP is enabled.')
+            self.notify_info_message('VIP: ON')
+        else:
+            self.notify_warning_message('VIP: OFF')
 
         return True
 
