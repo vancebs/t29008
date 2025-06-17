@@ -16,7 +16,7 @@ A multi-download tool to download Qualcomm device with 9008(EDL) based on **QSha
 * Simple 1
   * Add t29008 to PATH
   * cd to the image dir
-  * cmd: ```t29008``` or ```python t29008.exe```
+  * cmd: ```t29008```
 
 * Simple 2
   * Copy t29008 to image directory.
