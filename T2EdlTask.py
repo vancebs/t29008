@@ -96,12 +96,7 @@ class T2EdlTask(Task):
         ]
 
         # run sahara
-        sahara = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            encoding=T2EdlTask.encoding()
-        )
+        sahara = T2EdlTask._create_process(cmd)
         sahara.wait()
 
         # save logs
@@ -134,14 +129,7 @@ class T2EdlTask(Task):
             cmd.append('--power=reset,1')
 
         # run fh_loader
-        fh_loader = subprocess.Popen(
-            cmd,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding=T2EdlTask.encoding()
-        )
+        fh_loader = T2EdlTask._create_process(cmd)
 
         # # write \n to pass 'Press any key to exit' when error
         # fh_loader.stdin.write('\n')
@@ -154,6 +142,27 @@ class T2EdlTask(Task):
         # result
         fh_loader.wait()
         return fh_loader.returncode == 0, os.path.realpath(trace_file)
+
+    @staticmethod
+    def _create_process(cmd: Sequence[str]) -> subprocess.Popen:
+        if platform.system() == 'Windows':
+            return subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                encoding=T2EdlTask.encoding(),
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+            )
+        else:
+            return subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                encoding=T2EdlTask.encoding(),
+                start_new_session=True
+            )
 
     def parse_hf_loader_line(self, line: str):
         matched = T2EdlTask.PATTERN_FH_LOADER_PERCENT_LINE.match(line)
