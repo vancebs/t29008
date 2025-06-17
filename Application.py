@@ -17,6 +17,7 @@ class Application(object):
 
     def __init__(self, script_dir: str = os.path.dirname(os.path.realpath(__file__))):
         self._application_dir = os.path.basename(sys.argv[0])
+        self._working_dir = os.getcwd()
         self._script_dir = script_dir
         self._misc_dir = os.path.join(self._script_dir, 'misc')
         self._tool_dir = os.path.join(self._misc_dir, 'vip_download_tool')
@@ -26,11 +27,14 @@ class Application(object):
             'script_dir': self._script_dir
         })
 
-    def script_dir(self):
-        return self._script_dir
-
     def application_dir(self) -> str:
         return self._application_dir
+
+    def working_dir(self) -> str:
+        return self._working_dir
+
+    def script_dir(self):
+        return self._script_dir
 
     def misc_dir(self) -> str:
         return self._misc_dir

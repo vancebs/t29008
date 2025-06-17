@@ -13,25 +13,42 @@ A multi-download tool to download Qualcomm device with 9008(EDL) based on **QSha
 
 
 ## Usage
-```
-parameters
-    -vip|-v                          enable vip download
-    -reboot-on-success|-r            reboot device when download success
-    -trace-dir|-t <dir>              dir to save port_trace (default dir is "port_trace")
-    -image-dir|-i <dir>              image dir
-    -max-download-count|-n <count>   auto stop after n device is downloaded
-    -prog|-p <filename>              prog file name (default is "prog_firehose_ddr.elf")
-    -signeddigests|-sd <filename>    file name of signed digests (auto search if not set)
-    -chaineddigests|-cd <filename>   file name of chained digests (auto search if not set)
+* Simple 1
+  * Add t29008 to PATH
+  * cd to the image dir
+  * cmd: ```t29008``` or ```python t29008.exe```
 
-exit
-    ctrl + c
+* Simple 2
+  * Copy t29008 to image directory.
+  * Double-click t29008.
 
-i.e.
-    python t29008.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image
-    python t29008.py -v -r -t my_port_trace -i vip_image
-    python t29008.py -v -r -t my_port_trace -i vip_image -p prog_firehose_ddr.elf -sd DigestsSigned.bin.mbn -cd ChainedTableOfDigests.bin
-```
+* More
+  ```
+  parameters
+      -reboot-on-success|-r            reboot device when download success
+                                       not set: no reboot
+      -trace-dir|-t <dir>              dir to save port_trace
+                                       not set: "port_trace" under current working directory
+      -image-dir|-i <dir>              image dir
+                                       not set: current working directory
+      -max-download-count|-n <count>   auto stop after n device is downloaded
+                                       not set: no limit
+      -prog|-p <filename>              prog file name
+                                       not set: "prog_firehose_ddr.elf" as default
+      -vip|-v <on|off>                 on: enable vip download
+                                       off: disable vip download
+                                       not set: auto enabled if signeddigests and chaineddigests are detected
+      -signeddigests|-sd <filename>    file name of signed digests
+                                       not set: auto search if -vip not set or set to on
+      -chaineddigests|-cd <filename>   file name of chained digests
+                                       not set: auto search if -vip not set or set to on
+  
+  i.e.
+      t29008
+      t29008 -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image
+      t29008 -v -r -t my_port_trace -i vip_image
+      t29008 -v -r -t my_port_trace -i vip_image -p prog_firehose_ddr.elf -sd DigestsSigned.bin.mbn -cd ChainedTableOfDigests.bin
+  ```
 
 ## Build Binary
 ### Windows

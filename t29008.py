@@ -1,7 +1,9 @@
 import os.path
 import signal
 import sys
+from collections.abc import Sequence
 
+from Application import Application
 from T2Edl import T2Edl
 from T2EdlUi import T2EdlUi
 
@@ -9,19 +11,29 @@ from T2EdlUi import T2EdlUi
 def show_help():
     print('\n'.join((
         'parameters',
-        '    -vip|-v                          enable vip download',
         '    -reboot-on-success|-r            reboot device when download success',
-        '    -trace-dir|-t <dir>              dir to save port_trace (default dir is "port_trace")',
+        '                                     not set: no reboot',
+        '    -trace-dir|-t <dir>              dir to save port_trace',
+        '                                     not set: "port_trace" under current working directory',
         '    -image-dir|-i <dir>              image dir',
+        '                                     not set: current working directory',
         '    -max-download-count|-n <count>   auto stop after n device is downloaded',
-        '    -prog|-p <filename>              prog file name (default is "prog_firehose_ddr.elf")',
-        '    -signeddigests|-sd <filename>    file name of signed digests (auto search if not set)',
-        '    -chaineddigests|-cd <filename>   file name of chained digests (auto search if not set)',
+        '                                     not set: no limit',
+        '    -prog|-p <filename>              prog file name',
+        '                                     not set: "prog_firehose_ddr.elf" as default',
+        '    -vip|-v <on|off>                 on: enable vip download',
+        '                                     off: disable vip download',
+        '                                     not set: auto enabled if signeddigests and chaineddigests are detected',
+        '    -signeddigests|-sd <filename>    file name of signed digests',
+        '                                     not set: auto search if -vip not set or set to on',
+        '    -chaineddigests|-cd <filename>   file name of chained digests',
+        '                                     not set: auto search if -vip not set or set to on',
         '',
         'i.e.',
-        '    python t29008.py -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image',
-        '    python t29008.py -v -r -t my_port_trace -i vip_image',
-        '    python t29008.py -v -r -t my_port_trace -i vip_image -p prog_firehose_ddr.elf -sd DigestsSigned.bin.mbn -cd ChainedTableOfDigests.bin'
+        '    t29008',
+        '    t29008 -vip -reboot-on-success -trace-dir my_port_trace -image-dir vip_image',
+        '    t29008 -v -r -t my_port_trace -i vip_image',
+        '    t29008 -v -r -t my_port_trace -i vip_image -p prog_firehose_ddr.elf -sd DigestsSigned.bin.mbn -cd ChainedTableOfDigests.bin'
     )))
 
 
@@ -31,13 +43,20 @@ def show_error(msg: str):
     show_help()
 
 
+def verify_args_count(args: Sequence[str], size: int, err_msg: str) -> bool:
+    if len(args) < size:
+        show_error(err_msg)
+        return False
+    return True
+
+
 def main() -> int:
-    is_vip = False
     reboot_on_success = False
     trace_dir = 'port_trace'
-    image_dir: str|None = None
+    image_dir: str = Application.get().working_dir()
     max_download_count: int = 0
     prog: str = 'prog_firehose_ddr.elf'
+    is_vip: bool | None = None
     signed_digests: str|None = None
     chained_digests: str|None = None
 
@@ -45,27 +64,21 @@ def main() -> int:
     args = [arg for arg in sys.argv[1:]]
     while len(args) > 0:
         match args[0]:
-            case '-vip' | '-v':
-                is_vip = True
-                args = args[1:]
             case '-reboot-on-success' | '-r':
                 reboot_on_success = True
                 args = args[1:]
             case '-trace-dir' | '-t':
-                if len(args) < 2:
-                    show_error('trace dir not provided!!')
+                if not verify_args_count(args, 2, 'trace dir not provided!!'):
                     return -1
                 trace_dir = args[1]
                 args = args[2:]
             case '-image-dir' | '-i':
-                if len(args) < 2:
-                    show_error('image dir not provided!!')
+                if not verify_args_count(args, 2, 'image dir not provided!!'):
                     return -1
                 image_dir = args[1]
                 args = args[2:]
             case '-max-download-count' | '-n':
-                if len(args) < 2:
-                    show_error('download count not provided!!')
+                if not verify_args_count(args, 2, 'download count not provided!!'):
                     return -1
                 if not args[1].isdigit():
                     show_error('download count should be in digit!!')
@@ -73,20 +86,22 @@ def main() -> int:
                 max_download_count = int(args[1])
                 args = args[2:]
             case '-prog' | '-p':
-                if len(args) < 2:
-                    show_error('prog file name not provided!!')
+                if not verify_args_count(args, 2, 'prog file name not provided!!'):
                     return -1
                 prog = args[1]
                 args = args[2:]
+            case '-vip' | '-v':
+                if not verify_args_count(args, 2, 'vip on/off not provided!!'):
+                    return -1
+                is_vip = args[1] == 'on'
+                args = args[2:]
             case '-signeddigests' | '-sd':
-                if len(args) < 2:
-                    show_error('signeddigests file name not provided!!')
+                if not verify_args_count(args, 2, 'signeddigests file name not provided!!'):
                     return -1
                 signed_digests = args[1]
                 args = args[2:]
             case '-chaineddigests' | '-cd':
-                if len(args) < 2:
-                    show_error('chaineddigests file name not provided!!')
+                if not verify_args_count(args, 2, 'chaineddigests file name not provided!!'):
                     return -1
                 chained_digests = args[1]
                 args = args[2:]
@@ -106,11 +121,11 @@ def main() -> int:
 
     # create instance
     instance = T2Edl(image_dir=image_dir,
-                     is_vip=is_vip,
                      reboot_on_success=reboot_on_success,
                      trace_dir=trace_dir,
                      max_download_count=max_download_count,
                      prog=prog,
+                     is_vip=is_vip,
                      signed_digests=signed_digests,
                      chained_digests=chained_digests)
     instance.watch(T2EdlUi())

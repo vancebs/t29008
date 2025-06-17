@@ -3,7 +3,7 @@ import platform
 import re
 import subprocess
 from datetime import datetime
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Sequence
 
 from Application import Application
 from Task import Task
@@ -43,9 +43,9 @@ class T2EdlTask(Task):
                  port: str,
                  image_dir: str,
                  trace_dir: str,
-                 is_vip: bool = False,
                  reboot_on_success: bool = False,
                  prog: str = 'prog_firehose_ddr.elf',
+                 is_vip: bool | None = None,
                  signed_digests: str | None = None,
                  chained_digests: str | None = None):
         super().__init__()
@@ -53,9 +53,9 @@ class T2EdlTask(Task):
         self._port = port
         self._image_dir = image_dir
         self._trace_dir = trace_dir
-        self._is_vip = is_vip
         self._reboot_on_success = reboot_on_success
         self._prog = prog
+        self._is_vip = is_vip
         self._signed_digests = signed_digests
         self._chained_digests = chained_digests
 
@@ -126,18 +126,6 @@ class T2EdlTask(Task):
             f'--porttracename={trace_file}'
         ]
         if self._is_vip:
-            # find signeddigests
-            if self._signed_digests is None:
-                self._signed_digests = T2EdlTask.param_signeddigests(self._image_dir)
-                if self._signed_digests is None:
-                    return False, 'signeddigests file not exists'
-
-            # find chaineddigests
-            if self._chained_digests is None:
-                self._chained_digests = T2EdlTask.param_chaineddigests(self._image_dir)
-                if self._chained_digests is None:
-                    return False, 'chaineddigests file not exists'
-
             cmd.extend([
                 f'--signeddigests={self._signed_digests}',
                 f'--chaineddigests={self._chained_digests}'])
@@ -203,20 +191,24 @@ class T2EdlTask(Task):
         return '1' if platform.system() == 'Windows' else '0'
 
     @staticmethod
-    def param_signeddigests(image_dir: str) -> str|None:
-        file_list = os.listdir(image_dir)
-        for filename in T2EdlTask.SIGNEDDIGESTS_SEARCH_LIST:
-            if filename in file_list:
-                return filename
-        return None
+    def auto_detect(image_dir: str, detect_list: Sequence[str], detected_filename: str|None = None) -> str|None:
+        if detected_filename is None:
+            file_list = os.listdir(image_dir)
+            for filename in detect_list:
+                if filename in file_list:
+                    detected_filename = filename
+                    break
+        if detected_filename is not None and not os.path.exists(os.path.join(image_dir, detected_filename)):
+            detected_filename = None
+        return detected_filename
 
     @staticmethod
-    def param_chaineddigests(image_dir: str) -> str|None:
-        file_list = os.listdir(image_dir)
-        for filename in T2EdlTask.CHAINEDDIGESTS_SEARCH_LIST:
-            if filename in file_list:
-                return filename
-        return None
+    def param_signeddigests(image_dir: str, signed_digests: str|None = None) -> str|None:
+        return T2EdlTask.auto_detect(image_dir, T2EdlTask.SIGNEDDIGESTS_SEARCH_LIST, signed_digests)
+
+    @staticmethod
+    def param_chaineddigests(image_dir: str, chained_digests: str|None = None) -> str|None:
+        return T2EdlTask.auto_detect(image_dir, T2EdlTask.CHAINEDDIGESTS_SEARCH_LIST, chained_digests)
 
     @staticmethod
     def encoding():

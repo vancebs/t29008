@@ -36,19 +36,19 @@ class T2Edl(object):
 
     def __init__(self,
                  image_dir: str,
-                 is_vip: bool = False,
                  reboot_on_success: bool = False,
                  trace_dir: str = os.path.join(Application.get().application_dir(), 'port_trace'),
                  max_download_count: int = 0,
                  prog: str = 'prog_firehose_ddr.elf',
+                 is_vip: bool|None = None,
                  signed_digests: str|None = None,
                  chained_digests: str|None = None):
         self._image_dir = image_dir
-        self._is_vip = is_vip
         self._reboot_on_success = reboot_on_success
         self._trace_dir = trace_dir
         self._max_download_count = max_download_count
         self._prog = prog
+        self._is_vip = is_vip
         self._signed_digests = signed_digests
         self._chained_digests = chained_digests
 
@@ -62,6 +62,35 @@ class T2Edl(object):
         self._monitor = UsbMonitor()
         self._monitor.set_arrival_listener(lambda port: self.on_arrival(port))
         self._monitor.set_removed_listener(lambda port: self.on_removed(port))
+
+    def verify_vip(self) -> bool:
+        # check vip
+        if self._is_vip is None:
+            # auto find signed digests and chained digests if not set
+            self._signed_digests = T2EdlTask.param_signeddigests(self._image_dir, self._signed_digests)
+            self._chained_digests = T2EdlTask.param_chaineddigests(self._image_dir, self._chained_digests)
+
+            # enable vip if both signed digests and chained digests files are exists
+            self._is_vip = self._signed_digests is not None and self._chained_digests is not None
+        elif self._is_vip:
+            # auto find signed digests and chained digests if not set
+            self._signed_digests = T2EdlTask.param_signeddigests(self._image_dir, self._signed_digests)
+            self._chained_digests = T2EdlTask.param_chaineddigests(self._image_dir, self._chained_digests)
+
+            if self._signed_digests is None:
+                self.notify_error_message('signeddigests file not exists!!')
+                return False
+            if self._chained_digests is None:
+                self.notify_error_message('chaineddigests file not exists!!')
+                return False
+        else: # self._is_vip == False
+            self._signed_digests = None
+            self._chained_digests = None
+
+        if self._is_vip:
+            self.notify_info_message('VIP is enabled.')
+
+        return True
 
     def on_task_state_updated(self, key: str, task: Task, state: int, cur_progress: int, max_progress: int, message: str|None):
         match state:
@@ -82,6 +111,10 @@ class T2Edl(object):
         if not self._stopped:
             return
         self._stopped = False
+
+        if not self.verify_vip():
+            self._stopped = True
+            return  # failed
 
         self.notify_started()
         self.notify_info_message('Start downloading...')
@@ -112,9 +145,9 @@ class T2Edl(object):
         task = T2EdlTask(port,
                          self._image_dir,
                          self._trace_dir,
-                         is_vip=self._is_vip,
                          reboot_on_success=self._reboot_on_success,
                          prog=self._prog,
+                         is_vip=self._is_vip,
                          signed_digests=self._signed_digests,
                          chained_digests=self._chained_digests)
         self._running_tasks[port] = task
