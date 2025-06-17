@@ -89,9 +89,9 @@ class T2Edl(object):
 
         # show vip status
         if self._is_vip:
-            self.notify_info_message('VIP: ON')
+            self.notify_warning_message('VIP: ON')
         else:
-            self.notify_warning_message('VIP: OFF')
+            self.notify_info_message('VIP: OFF')
 
         return True
 
