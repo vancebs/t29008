@@ -115,6 +115,7 @@ class T2Edl(object):
             return
         self._stopped = False
 
+        self.notify_info_message(f'Image Path: {self._image_dir}')
         if not self.verify_vip():
             self._stopped = True
             return  # failed
