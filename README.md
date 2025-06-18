@@ -6,7 +6,7 @@ A multi-download tool to download Qualcomm device with 9008(EDL) based on **QSha
 ## Requirements
 * Supported OS
   * Windows
-  * Linux (Tested on Ubuntu 24.04)
+  * Linux (Ubuntu 18.04 +)
 * Python
   * version >= 3.8
 
