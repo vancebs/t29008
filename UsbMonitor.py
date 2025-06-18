@@ -96,8 +96,8 @@ class WindowsUsbMonitor(PollingUsbMonitor):
 
 
 class LinuxUsbMonitor(PollingUsbMonitor):
-    PATTERN_ATTACH_LINE = re.compile(r'\s*\[\s*\d+\.\d+]\s+usb\s+\d+-\d+:\s+Qualcomm\s+USB\s+modem\s+converter\s+now\s+attached\s+to\s+(?P<port>ttyUSB\d+)\s*')
-    PATTERN_DETACH_LINE = re.compile(r'\s*\[\s*\d+\.\d+]\s+qcserial\s+ttyUSB\d+:\s+Qualcomm\s+USB\s+modem\s+converter\s+now\s+disconnected\s+from\s+(?P<port>ttyUSB\d+)\s*')
+    PATTERN_ATTACH_LINE = re.compile(r'\s*.+:\s+Qualcomm\s+USB\s+modem\s+converter\s+now\s+attached\s+to\s+(?P<port>ttyUSB\d+)\s*')
+    PATTERN_DETACH_LINE = re.compile(r'\s*.+:\s+Qualcomm\s+USB\s+modem\s+converter\s+now\s+disconnected\s+from\s+(?P<port>ttyUSB\d+)\s*')
 
     def __init__(self):
         super().__init__()
