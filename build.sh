@@ -23,6 +23,7 @@ echo "### Installing packages... Done"
 
 echo "### Building exe..."
 python -m PyInstaller --distpath $DIST_DIR --add-data "$SCRIPT_DIR/misc/vip_download_tool/fh_loader:misc/vip_download_tool" --add-data "$SCRIPT_DIR/misc/vip_download_tool/QSaharaServer:misc/vip_download_tool" -F t29008.py
+chmod a+x "$DIST_DIR/t29008"
 echo "### Building exe... Done"
 
 echo "### Copying misc..."
