@@ -1,8 +1,7 @@
 import os.path
 import signal
 import sys
-from collections.abc import Sequence
-from typing import Union
+from typing import Union, Sequence
 
 from Application import Application
 from T2Edl import T2Edl
