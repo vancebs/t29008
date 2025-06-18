@@ -69,16 +69,16 @@ class T2EdlTask(Task):
         if not os.path.exists(self._trace_dir):
             os.makedirs(self._trace_dir, exist_ok=True)
 
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')[0:-3]
-        sahara_trace = os.path.join(self._trace_dir, f'{timestamp}_{self._port}_sahara.log')
-        fh_loader_trace = os.path.join(self._trace_dir, f'{timestamp}_{self._port}_fh_loader.log')
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')[0:-3]
+        sahara_trace_filename = f'{timestamp}_{self._port}_sahara.log'
+        fh_loader_trace_filename = f'{timestamp}_{self._port}_fh_loader.log'
 
-        result, msg = self.download_sahara(sahara_trace)
+        result, msg = self.download_sahara(sahara_trace_filename)
         if not result:
             self.set_state(Task.STATE_ERROR, message=msg)
             return False
 
-        result, msg = self.download_fh_loader(fh_loader_trace)
+        result, msg = self.download_fh_loader(fh_loader_trace_filename)
         if not result:
             self.set_state(Task.STATE_ERROR, message=msg)
             return False
@@ -87,7 +87,9 @@ class T2EdlTask(Task):
 
         return True
 
-    def download_sahara(self, trace_file: str) -> Tuple[bool, str]:
+    def download_sahara(self, trace_filename: str) -> Tuple[bool, str]:
+        trace_file = os.path.join(self._trace_dir, trace_filename)
+
         cmd = [
             T2EdlTask.bin_sahara(),
             '-p', T2EdlTask.param_port(self._port),
@@ -105,9 +107,11 @@ class T2EdlTask(Task):
             file.write(sahara.stdout.read())
 
         # result
-        return sahara.returncode == 0, os.path.realpath(trace_file)
+        return sahara.returncode == 0, trace_filename
 
-    def download_fh_loader(self, trace_file: str) -> Tuple[bool, str]:
+    def download_fh_loader(self, trace_filename: str) -> Tuple[bool, str]:
+        trace_file = os.path.join(self._trace_dir, trace_filename)
+
         # cmd
         cmd = [
             T2EdlTask.bin_fh_loader(),
@@ -141,7 +145,7 @@ class T2EdlTask(Task):
 
         # result
         fh_loader.wait()
-        return fh_loader.returncode == 0, os.path.realpath(trace_file)
+        return fh_loader.returncode == 0, trace_filename
 
     @staticmethod
     def _create_process(cmd: Sequence[str]) -> subprocess.Popen:

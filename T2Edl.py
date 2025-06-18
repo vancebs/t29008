@@ -118,17 +118,32 @@ class T2Edl(object):
             return
         self._stopped = False
 
+        # verify parameter
+        if not os.path.exists(self._image_dir):
+            self.notify_error_message(f'Image path not exists: {self._image_dir}')
+            return  # failed
+
+        # get real path
+        self._image_dir = os.path.realpath(self._image_dir)
+        self._trace_dir = os.path.realpath(self._trace_dir)
+
+        # print path
         self.notify_info_message(f'Image Path: {self._image_dir}')
+        self.notify_info_message(f'trace Dir: {self._trace_dir}')
+
+        # verify VIP
         if not self.verify_vip():
             self._stopped = True
             return  # failed
 
+        # show starting
         self.notify_started()
         self.notify_info_message('Start downloading...')
 
         # start UsbMonitor
         self._monitor.start()
 
+        # stop
         self.stop()
 
     def stop(self):
