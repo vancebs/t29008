@@ -101,7 +101,7 @@ class T2EdlTask(Task):
 
         # save logs
         with open(trace_file, 'w') as file:
-            file.write(f'cmd: {' '.join(cmd)}\n\n')
+            file.write(f'cmd: {" ".join(cmd)}\n\n')
             file.write(sahara.stdout.read())
 
         # result
