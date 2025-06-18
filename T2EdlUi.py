@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn, TaskID
@@ -30,7 +30,7 @@ class T2EdlUi(Watcher):
     def on_start_progress(self, key: str):
         self._tasks[key] = self._progress.add_task(f'[green]{key}', total=None)
 
-    def on_stop_progress(self, key: str, success: bool, message: str|None):
+    def on_stop_progress(self, key: str, success: bool, message: Union[str, None]):
         if key not in self._tasks:
             self._console.log(f'Invalid device: {key} ({message})')
             return
@@ -46,7 +46,7 @@ class T2EdlUi(Watcher):
         else:
             self._console.log(f'[red]{key} Error ({message})')
 
-    def on_update_progress(self, key: str, cur_progress: int, max_progress: int|None):
+    def on_update_progress(self, key: str, cur_progress: int, max_progress: Union[int, None]):
         if key not in self._tasks:
             self._console.log(f'Invalid device: {key}')
             return

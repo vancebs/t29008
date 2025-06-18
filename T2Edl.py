@@ -1,7 +1,5 @@
 import os.path
-import threading
-from datetime import datetime
-from typing import Dict
+from typing import Dict, Union
 
 from Application import Application
 from T2EdlTask import T2EdlTask
@@ -22,10 +20,10 @@ class Watcher(object):
     def on_start_progress(self, key: str):
         pass
 
-    def on_stop_progress(self, key: str, success: bool, message: str|None):
+    def on_stop_progress(self, key: str, success: bool, message: Union[str, None]):
         pass
 
-    def on_update_progress(self, key: str, cur_progress: int, max_progress: int|None):
+    def on_update_progress(self, key: str, cur_progress: int, max_progress: Union[int, None]):
         pass
 
 
@@ -40,9 +38,9 @@ class T2Edl(object):
                  trace_dir: str = os.path.join(Application.get().application_dir(), 'port_trace'),
                  max_download_count: int = 0,
                  prog: str = 'prog_firehose_ddr.elf',
-                 is_vip: bool|None = None,
-                 signed_digests: str|None = None,
-                 chained_digests: str|None = None):
+                 is_vip: Union[bool, None] = None,
+                 signed_digests: Union[str, None] = None,
+                 chained_digests: Union[str, None] = None):
         self._image_dir = image_dir
         self._reboot_on_success = reboot_on_success
         self._trace_dir = trace_dir
@@ -54,7 +52,7 @@ class T2Edl(object):
 
         self._started_task_count = 0
 
-        self._watcher: Watcher|None = None
+        self._watcher: Union[Watcher, None] = None
 
         self._stopped = True
         self._running_tasks: Dict[str, Task] = dict()
@@ -95,20 +93,25 @@ class T2Edl(object):
 
         return True
 
-    def on_task_state_updated(self, key: str, task: Task, state: int, cur_progress: int, max_progress: int, message: str|None):
-        match state:
-            case Task.STATE_IDLE:
-                if message:
-                    self.notify_message(f'[red][{key}] {message}')
-                self.notify_update_progress(key)
-            case Task.STATE_RUNNING:
-                if message:
-                    self.notify_message(f'[red][{key}] {message}')
-                self.notify_update_progress(key, cur_progress, max_progress)
-            case Task.STATE_SUCCESS:
-                self.notify_stop_progress(key, True, message)
-            case Task.STATE_ERROR:
-                self.notify_stop_progress(key, False, message)
+    def on_task_state_updated(self,
+                              key: str,
+                              task: Task,
+                              state: int,
+                              cur_progress: int,
+                              max_progress: int,
+                              message: Union[str, None]):
+        if state == Task.STATE_IDLE:
+            if message:
+                self.notify_message(f'[red][{key}] {message}')
+            self.notify_update_progress(key)
+        elif state == Task.STATE_RUNNING:
+            if message:
+                self.notify_message(f'[red][{key}] {message}')
+            self.notify_update_progress(key, cur_progress, max_progress)
+        elif state == Task.STATE_SUCCESS:
+            self.notify_stop_progress(key, True, message)
+        elif state == Task.STATE_ERROR:
+            self.notify_stop_progress(key, False, message)
 
     def start(self):
         if not self._stopped:
@@ -202,10 +205,10 @@ class T2Edl(object):
         if self._watcher:
             self._watcher.on_start_progress(key)
 
-    def notify_stop_progress(self, key: str, success: bool, message: str|None):
+    def notify_stop_progress(self, key: str, success: bool, message: Union[str, None]):
         if self._watcher:
             self._watcher.on_stop_progress(key, success, message)
 
-    def notify_update_progress(self, key: str, cur_progress: int = 0, max_progress: int|None = None):
+    def notify_update_progress(self, key: str, cur_progress: int = 0, max_progress: Union[int, None] = None):
         if self._watcher:
             self._watcher.on_update_progress(key, cur_progress, max_progress)

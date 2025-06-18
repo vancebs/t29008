@@ -3,7 +3,7 @@ import platform
 import re
 import subprocess
 from datetime import datetime
-from typing import Callable, Tuple, Sequence
+from typing import Callable, Tuple, Sequence, Union
 
 from Application import Application
 from Task import Task
@@ -45,9 +45,9 @@ class T2EdlTask(Task):
                  trace_dir: str,
                  reboot_on_success: bool = False,
                  prog: str = 'prog_firehose_ddr.elf',
-                 is_vip: bool | None = None,
-                 signed_digests: str | None = None,
-                 chained_digests: str | None = None):
+                 is_vip: Union[bool, None] = None,
+                 signed_digests: Union[str, None] = None,
+                 chained_digests: Union[str, None] = None):
         super().__init__()
 
         self._port = port
@@ -181,13 +181,13 @@ class T2EdlTask(Task):
 
     @staticmethod
     def param_port(port: str) -> str:
-        match platform.system():
-            case 'Windows':
-                return f'\\\\.\\{port}'
-            case 'Linux':
-                return f'/dev/{port}'
-            case _:
-                return port
+        os_name = platform.system()
+        if os_name == 'Windows':
+            return f'\\\\.\\{port}'
+        elif os_name == 'Linux':
+            return f'/dev/{port}'
+        else:
+            return port
 
     @staticmethod
     def param_sendxml(image_dir: str) -> str:
@@ -201,7 +201,9 @@ class T2EdlTask(Task):
         return '1' if platform.system() == 'Windows' else '0'
 
     @staticmethod
-    def auto_detect(image_dir: str, detect_list: Sequence[str], detected_filename: str|None = None) -> str|None:
+    def auto_detect(image_dir: str,
+                    detect_list: Sequence[str],
+                    detected_filename: Union[str, None] = None) -> Union[str, None]:
         if detected_filename is None:
             file_list = os.listdir(image_dir)
             for filename in detect_list:
@@ -213,11 +215,11 @@ class T2EdlTask(Task):
         return detected_filename
 
     @staticmethod
-    def param_signeddigests(image_dir: str, signed_digests: str|None = None) -> str|None:
+    def param_signeddigests(image_dir: str, signed_digests: Union[str, None] = None) -> Union[str, None]:
         return T2EdlTask.auto_detect(image_dir, T2EdlTask.SIGNEDDIGESTS_SEARCH_LIST, signed_digests)
 
     @staticmethod
-    def param_chaineddigests(image_dir: str, chained_digests: str|None = None) -> str|None:
+    def param_chaineddigests(image_dir: str, chained_digests: Union[str, None] = None) -> Union[str, None]:
         return T2EdlTask.auto_detect(image_dir, T2EdlTask.CHAINEDDIGESTS_SEARCH_LIST, chained_digests)
 
     @staticmethod

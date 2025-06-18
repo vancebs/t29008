@@ -2,6 +2,7 @@ import os.path
 import signal
 import sys
 from collections.abc import Sequence
+from typing import Union
 
 from Application import Application
 from T2Edl import T2Edl
@@ -59,58 +60,58 @@ def main() -> int:
     image_dir: str = Application.get().working_dir()
     max_download_count: int = 0
     prog: str = 'prog_firehose_ddr.elf'
-    is_vip: bool | None = None
-    signed_digests: str|None = None
-    chained_digests: str|None = None
+    is_vip: Union[bool, None] = None
+    signed_digests: Union[str, None] = None
+    chained_digests: Union[str, None] = None
 
     # load parameter
     args = [arg for arg in sys.argv[1:]]
     while len(args) > 0:
-        match args[0]:
-            case '-reboot-on-success' | '-r':
-                reboot_on_success = True
-                args = args[1:]
-            case '-trace-dir' | '-t':
-                if not verify_args_count(args, 2, 'trace dir not provided!!'):
-                    return -1
-                trace_dir = args[1]
-                args = args[2:]
-            case '-image-dir' | '-i':
-                if not verify_args_count(args, 2, 'image dir not provided!!'):
-                    return -1
-                image_dir = args[1]
-                args = args[2:]
-            case '-max-download-count' | '-n':
-                if not verify_args_count(args, 2, 'download count not provided!!'):
-                    return -1
-                if not args[1].isdigit():
-                    show_error('download count should be in digit!!')
-                    return -1
-                max_download_count = int(args[1])
-                args = args[2:]
-            case '-prog' | '-p':
-                if not verify_args_count(args, 2, 'prog file name not provided!!'):
-                    return -1
-                prog = args[1]
-                args = args[2:]
-            case '-vip' | '-v':
-                if not verify_args_count(args, 2, 'vip on/off not provided!!'):
-                    return -1
-                is_vip = args[1] == 'on'
-                args = args[2:]
-            case '-signeddigests' | '-sd':
-                if not verify_args_count(args, 2, 'signeddigests file name not provided!!'):
-                    return -1
-                signed_digests = args[1]
-                args = args[2:]
-            case '-chaineddigests' | '-cd':
-                if not verify_args_count(args, 2, 'chaineddigests file name not provided!!'):
-                    return -1
-                chained_digests = args[1]
-                args = args[2:]
-            case _:
-                show_error(f'unknown parameter: "{args[0]}"')
+        param = args[0]
+        if param in ('-reboot-on-success', '-r'):
+            reboot_on_success = True
+            args = args[1:]
+        elif param in ('-trace-dir', '-t'):
+            if not verify_args_count(args, 2, 'trace dir not provided!!'):
                 return -1
+            trace_dir = args[1]
+            args = args[2:]
+        elif param in ('-image-dir', '-i'):
+            if not verify_args_count(args, 2, 'image dir not provided!!'):
+                return -1
+            image_dir = args[1]
+            args = args[2:]
+        elif param in ('-max-download-count', '-n'):
+            if not verify_args_count(args, 2, 'download count not provided!!'):
+                return -1
+            if not args[1].isdigit():
+                show_error('download count should be in digit!!')
+                return -1
+            max_download_count = int(args[1])
+            args = args[2:]
+        elif param in ('-prog', '-p'):
+            if not verify_args_count(args, 2, 'prog file name not provided!!'):
+                return -1
+            prog = args[1]
+            args = args[2:]
+        elif param in ('-vip', '-v'):
+            if not verify_args_count(args, 2, 'vip on/off not provided!!'):
+                return -1
+            is_vip = args[1] == 'on'
+            args = args[2:]
+        elif param in ('-signeddigests', '-sd'):
+            if not verify_args_count(args, 2, 'signeddigests file name not provided!!'):
+                return -1
+            signed_digests = args[1]
+            args = args[2:]
+        elif param in ('-chaineddigests', '-cd'):
+            if not verify_args_count(args, 2, 'chaineddigests file name not provided!!'):
+                return -1
+            chained_digests = args[1]
+            args = args[2:]
+        else:
+            show_error(f'unknown parameter: "{args[0]}"')
+            return -1
 
     if image_dir is None:
         show_error('image dir not provided')

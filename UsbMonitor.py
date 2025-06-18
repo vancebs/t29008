@@ -3,7 +3,7 @@ import platform
 import re
 import subprocess
 import time
-from typing import Callable, Set
+from typing import Callable, Set, Union
 
 from Application import Application
 
@@ -11,8 +11,8 @@ from Application import Application
 class BaseUsbMonitor(object):
     def __init__(self):
         self._stopped = True
-        self._on_arrival: Callable[[str], None] | None = None
-        self._on_removed: Callable[[str], None] | None = None
+        self._on_arrival: Union[Callable[[str], None], None] = None
+        self._on_removed: Union[Callable[[str], None], None] = None
 
     def start(self):
         if not self._stopped:
@@ -122,8 +122,8 @@ class LinuxUsbMonitor(PollingUsbMonitor):
         return ports
 
 
-match platform.system():
-    case 'Windows':
-        UsbMonitor = WindowsUsbMonitor
-    case 'Linux':
-        UsbMonitor = LinuxUsbMonitor
+os_name = platform.system()
+if os_name == 'Windows':
+    UsbMonitor = WindowsUsbMonitor
+elif os_name == 'Linux':
+    UsbMonitor = LinuxUsbMonitor

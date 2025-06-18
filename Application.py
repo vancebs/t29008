@@ -1,9 +1,10 @@
 import os
 import sys
+from typing import Union
 
 
 class Application(object):
-    _sInstance: 'Application|None' = None
+    _sInstance: 'Union[Application, None]' = None
 
     @staticmethod
     def init(application_dir: str):

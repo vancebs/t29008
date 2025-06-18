@@ -1,5 +1,6 @@
 import threading
 from collections.abc import Callable
+from typing import Union
 
 
 class Task(object):
@@ -10,9 +11,9 @@ class Task(object):
 
     def __init__(self):
         self._state = Task.STATE_IDLE
-        self._on_update_state: Callable[[int, int, int, str], None]|None = None
+        self._on_update_state: Union[Callable[[int, int, int, str], None], None] = None
         self._state_cond = threading.Condition()
-        self._thread: threading.Thread|None = None
+        self._thread: Union[threading.Thread, None] = None
 
     def state(self) -> int:
         return self._state
@@ -25,7 +26,7 @@ class Task(object):
             with self._state_cond:
                 self._state_cond.wait()
 
-    def set_state(self, state: int, cur_progress: int = 0, max_progress: int = 0, message: str|None = None):
+    def set_state(self, state: int, cur_progress: int = 0, max_progress: int = 0, message: Union[str, None] = None):
         if self._state == state and state != Task.STATE_RUNNING:
             return
 
@@ -46,7 +47,7 @@ class Task(object):
     def set_state_update_listener(self, listener: Callable[[int, int, int, str], None]):
         self._on_update_state = listener
 
-    def notify_state_update(self, state: int, cur_progress: int = 0, max_progress: int = 0, message: str|None = None):
+    def notify_state_update(self, state: int, cur_progress: int = 0, max_progress: int = 0, message: Union[str, None] = None):
         if self._on_update_state:
             self._on_update_state(state, cur_progress, max_progress, message)
 
