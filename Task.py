@@ -1,6 +1,5 @@
 import threading
-from collections.abc import Callable
-from typing import Union
+from typing import Union, Callable
 
 
 class Task(object):
