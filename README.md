@@ -17,13 +17,13 @@ A multi-download tool to download Qualcomm device with 9008(EDL) based on **QSha
   cd t29008
   .\build.bat
   ```
-  add "\<t29008 dir>\dist_windows" to system environment **PATH**
+  add **"\<t29008 dir>\dist_windows"** to system environment **PATH**
 * **Linux**
   ```bash
   git clone https://github.com/vancebs/t29008.git
   cd t29008
   ./build.sh
-  echo >> "$PWD/dist_linux":$PATH >> ~/.bashrc  # add to PATH
+  echo >> "$PWD/dist_linux:$PATH" >> ~/.bashrc  # add to PATH
   ```
 **NOTE: exe will not be delivered by release. Because there are dependence issues with PyInstaller generated exe.
 Please follow the steps above to generate exe locally.** 
