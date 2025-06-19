@@ -118,6 +118,14 @@ class T2Edl(object):
             return
         self._stopped = False
 
+        # title
+        self.notify_warning_message(f'Usage:')
+        self.notify_warning_message(f'    1. Switch device to 9008 mode and connect to PC with USB.')
+        self.notify_warning_message(f'    2. Download will auto start once device connected.')
+        self.notify_warning_message(f'    3. Connect more device for multi-downloading.')
+        self.notify_warning_message(f'    4. Ctrl + C to stop. t29008 will exit after all downloading finished.')
+        self.notify_warning_message(f'-------------------------------------------------------------------------')
+
         # verify parameter
         if not os.path.exists(self._image_dir):
             self.notify_error_message(f'Image path not exists: {self._image_dir}')
