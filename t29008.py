@@ -57,6 +57,43 @@ def verify_args_count(args: Sequence[str], size: int, err_msg: str) -> bool:
     return True
 
 
+def launch(
+        reboot_on_success = False,
+        trace_dir = 'port_trace',
+        image_dir: str = Application.get().working_dir(),
+        max_download_count: int = 0,
+        prog: str = 'prog_firehose_ddr.elf',
+        is_vip: Union[bool, None] = None,
+        signed_digests: Union[str, None] = None,
+        chained_digests: Union[str, None] = None,
+        disable_zeroout: bool = False,
+        disable_erase: bool = False):
+    os.makedirs(trace_dir, exist_ok=True)
+
+    # create instance
+    instance = T2Edl(image_dir=image_dir,
+                     reboot_on_success=reboot_on_success,
+                     trace_dir=trace_dir,
+                     max_download_count=max_download_count,
+                     prog=prog,
+                     is_vip=is_vip,
+                     signed_digests=signed_digests,
+                     chained_digests=chained_digests,
+                     disable_zeroout=disable_zeroout,
+                     disable_erase=disable_erase)
+    instance.watch(T2EdlUi())
+
+    # install ctrl_c handler
+    def ctrl_c_handler(signum, frame):
+        nonlocal instance
+        instance.stop()
+
+    signal.signal(signal.SIGINT, ctrl_c_handler)
+
+    # start
+    instance.start()
+
+
 def main() -> int:
     reboot_on_success = False
     trace_dir = 'port_trace'
@@ -130,30 +167,21 @@ def main() -> int:
     if os.path.exists(trace_dir) and not os.path.isdir(trace_dir):
         show_error(f'cannot create trace dir: {trace_dir}')
         return -1
-    os.makedirs(trace_dir, exist_ok=True)
 
-    # create instance
-    instance = T2Edl(image_dir=image_dir,
-                     reboot_on_success=reboot_on_success,
-                     trace_dir=trace_dir,
-                     max_download_count=max_download_count,
-                     prog=prog,
-                     is_vip=is_vip,
-                     signed_digests=signed_digests,
-                     chained_digests=chained_digests,
-                     disable_zeroout=disable_zeroout,
-                     disable_erase=disable_erase)
-    instance.watch(T2EdlUi())
+    # launch
+    launch(
+        reboot_on_success=reboot_on_success,
+        trace_dir=trace_dir,
+        image_dir=image_dir,
+        max_download_count=max_download_count,
+        prog=prog,
+        is_vip=is_vip,
+        signed_digests=signed_digests,
+        chained_digests=chained_digests,
+        disable_zeroout=disable_zeroout,
+        disable_erase=disable_erase)
 
-    # install ctrl_c handler
-    def ctrl_c_handler(signum, frame):
-        nonlocal instance
-        instance.stop()
-
-    signal.signal(signal.SIGINT, ctrl_c_handler)
-
-    # start
-    instance.start()
+    return 0
 
 
 if __name__ == '__main__':
