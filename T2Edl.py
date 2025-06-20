@@ -40,7 +40,9 @@ class T2Edl(object):
                  prog: str = 'prog_firehose_ddr.elf',
                  is_vip: Union[bool, None] = None,
                  signed_digests: Union[str, None] = None,
-                 chained_digests: Union[str, None] = None):
+                 chained_digests: Union[str, None] = None,
+                 disable_zeroout: bool = False,
+                 disable_erase: bool = False):
         self._image_dir = image_dir
         self._reboot_on_success = reboot_on_success
         self._trace_dir = trace_dir
@@ -49,6 +51,8 @@ class T2Edl(object):
         self._is_vip = is_vip
         self._signed_digests = signed_digests
         self._chained_digests = chained_digests
+        self._disable_zeroout = disable_zeroout
+        self._disable_erase = disable_erase
 
         self._started_task_count = 0
 
@@ -179,7 +183,9 @@ class T2Edl(object):
                          prog=self._prog,
                          is_vip=self._is_vip,
                          signed_digests=self._signed_digests,
-                         chained_digests=self._chained_digests)
+                         chained_digests=self._chained_digests,
+                         disable_zeroout=self._disable_zeroout,
+                         disable_erase=self._disable_erase)
         self._running_tasks[port] = task
         task.set_state_update_listener(
             lambda state, cur_progress, max_progress, message: self.on_task_state_updated(port, task, state,

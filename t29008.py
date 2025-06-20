@@ -12,22 +12,26 @@ def show_help():
     print('\n'.join((
         'parameters',
         '    -reboot-on-success|-r            reboot device when download success',
-        '                                     not set: no reboot',
+        '                                     <not set>: no reboot',
         '    -trace-dir|-t <dir>              dir to save port_trace',
-        '                                     not set: "port_trace" under current working directory',
+        '                                     <not set>: "port_trace" under current working directory',
         '    -image-dir|-i <dir>              image dir',
-        '                                     not set: current working directory',
+        '                                     <not set>: current working directory',
         '    -max-download-count|-n <count>   auto stop after n device is downloaded',
-        '                                     not set: no limit',
+        '                                     <not set>: no limit',
         '    -prog|-p <filename>              prog file name',
-        '                                     not set: "prog_firehose_ddr.elf" as default',
+        '                                     <not set>: "prog_firehose_ddr.elf" as default',
         '    -vip|-v <on|off>                 on: enable vip download',
         '                                     off: disable vip download',
-        '                                     not set: auto enabled if signeddigests and chaineddigests are detected',
+        '                                     <not set>: auto enabled if signeddigests and chaineddigests are detected',
         '    -signeddigests|-sd <filename>    file name of signed digests',
-        '                                     not set: auto search if -vip not set or set to on',
+        '                                     <not set>: auto search if -vip not set or set to on',
         '    -chaineddigests|-cd <filename>   file name of chained digests',
-        '                                     not set: auto search if -vip not set or set to on',
+        '                                     <not set>: auto search if -vip not set or set to on',
+        '    -disable-zeroout|-dz             disable <zeroout> tag support',
+        '                                     <not set>: enabled for non VIP downloading',
+        '    -disable-erase|-de               disable auto erasing modemst1 and modemst2',
+        '                                     <not set>: modemst1 & modemst2 are erased for non VIP downloading'
         '',
         'exit',
         '    ctrl + c',
@@ -62,6 +66,8 @@ def main() -> int:
     is_vip: Union[bool, None] = None
     signed_digests: Union[str, None] = None
     chained_digests: Union[str, None] = None
+    disable_zeroout: bool = False
+    disable_erase: bool = False
 
     # load parameter
     args = [arg for arg in sys.argv[1:]]
@@ -108,6 +114,10 @@ def main() -> int:
                 return -1
             chained_digests = args[1]
             args = args[2:]
+        elif param in ('-disable-zeroout', '-dz'):
+            disable_zeroout = True
+        elif param in ('-disable-erase', '-de'):
+            disable_erase = True
         else:
             show_error(f'unknown parameter: "{args[0]}"')
             return -1
@@ -130,7 +140,9 @@ def main() -> int:
                      prog=prog,
                      is_vip=is_vip,
                      signed_digests=signed_digests,
-                     chained_digests=chained_digests)
+                     chained_digests=chained_digests,
+                     disable_zeroout=disable_zeroout,
+                     disable_erase=disable_erase)
     instance.watch(T2EdlUi())
 
     # install ctrl_c handler

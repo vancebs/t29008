@@ -47,7 +47,9 @@ class T2EdlTask(Task):
                  prog: str = 'prog_firehose_ddr.elf',
                  is_vip: Union[bool, None] = None,
                  signed_digests: Union[str, None] = None,
-                 chained_digests: Union[str, None] = None):
+                 chained_digests: Union[str, None] = None,
+                 disable_zeroout: bool = False,
+                 disable_erase: bool = False):
         super().__init__()
 
         self._port = port
@@ -58,6 +60,8 @@ class T2EdlTask(Task):
         self._is_vip = is_vip
         self._signed_digests = signed_digests
         self._chained_digests = chained_digests
+        self._disable_zeroout = disable_zeroout
+        self._disable_erase = disable_erase
 
         self._slash = '\\' if platform.system() == 'Windows' else '/'
         if not self._image_dir.endswith(self._slash):
@@ -131,6 +135,10 @@ class T2EdlTask(Task):
                 f'--chaineddigests={self._chained_digests}'])
         if self._reboot_on_success:
             cmd.append('--power=reset,1')
+        if not self._disable_zeroout:
+            cmd.append('--ex_zeroout')
+        if not self._disable_erase:
+            cmd.append('--ex_erase=5:modemst1,5:modemst2')
 
         # run fh_loader
         fh_loader = T2EdlTask._create_process(cmd)
