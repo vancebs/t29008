@@ -50,22 +50,26 @@ Please follow the steps above to generate exe locally.**
 ```
 parameters
     -reboot-on-success|-r            reboot device when download success
-                                     not set: no reboot
+                                     <not set>: no reboot
     -trace-dir|-t <dir>              dir to save port_trace
-                                     not set: "port_trace" under current working directory
+                                     <not set>: "port_trace" under current working directory
     -image-dir|-i <dir>              image dir
-                                     not set: current working directory
+                                     <not set>: current working directory
     -max-download-count|-n <count>   auto stop after n device is downloaded
-                                     not set: no limit
+                                     <not set>: no limit
     -prog|-p <filename>              prog file name
-                                     not set: "prog_firehose_ddr.elf" as default
+                                     <not set>: "prog_firehose_ddr.elf" as default
     -vip|-v <on|off>                 on: enable vip download
                                      off: disable vip download
-                                     not set: auto enabled if signeddigests and chaineddigests are detected
+                                     <not set>: auto enabled if signeddigests and chaineddigests are detected
     -signeddigests|-sd <filename>    file name of signed digests
-                                     not set: auto search if -vip not set or set to on
+                                     <not set>: auto search if -vip not set or set to on
     -chaineddigests|-cd <filename>   file name of chained digests
-                                     not set: auto search if -vip not set or set to on
+                                     <not set>: auto search if -vip not set or set to on
+    -disable-zeroout|-dz             disable <zeroout> tag support
+                                     <not set>: enabled for non VIP downloading
+    -disable-erase|-de               disable auto erasing modemst1 and modemst2
+                                     <not set>: modemst1 & modemst2 are erased for non VIP downloading
 
 exit
     ctrl + c
